@@ -1,0 +1,5 @@
+---
+- name: create virtual network
+  become: yes
+  debug:
+    msg: "create virtual network -> {{virtual_network}}"

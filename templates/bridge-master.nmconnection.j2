@@ -1,0 +1,25 @@
+[connection]
+id={{bridge_interface_name}}-master
+uuid={{(bridge_interface_name + 'br') | to_uuid}}
+type=bridge
+interface-name={{bridge_interface_name}}br
+
+[ethernet]
+
+[bridge]
+
+[ipv4]
+{% if (bridge_ip_method | default('auto')) == "manual" %}
+address1={{ansible_host}}/24,{{network_gateway}}
+dns={{network_nameservers | join(';')}};
+dns-search={{network_search_domain}};
+method=manual
+{% else %}
+method={{bridge_ip_method | default('auto')}}
+{% endif %}
+
+[ipv6]
+addr-gen-mode=default
+method=auto
+
+[proxy]

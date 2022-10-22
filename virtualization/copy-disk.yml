@@ -1,0 +1,4 @@
+---
+- name: copy virtual disks
+  debug:
+    msg: "copying disks {{src_guest}} -> {{dest_host}}:{{dest_dir}}"

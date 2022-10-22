@@ -1,0 +1,11 @@
+[connection]
+id={{bridge_interface_name}}-slave
+uuid={{bridge_interface_name | to_uuid}}
+type=ethernet
+interface-name={{bridge_interface_name}}
+master={{bridge_interface_name}}br
+slave-type=bridge
+
+[ethernet]
+
+[bridge-port]

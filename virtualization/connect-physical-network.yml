@@ -1,0 +1,4 @@
+---
+- name: setup static ip configuration
+  debug:
+    msg: "setting ip to {{ansible_host}}/24 gw {{network_gateway}}"

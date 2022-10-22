@@ -1,0 +1,32 @@
+---
+- name: deploy bridge-master files for each interface
+  become: yes
+  #notify: network_changed
+  template:
+    src: bridge-master.nmconnection.j2
+    dest: "/etc/NetworkManager/system-connections/{{bridge_interface_name}}-master.nmconnection"
+    mode: '0600'
+
+- name: deploy bridge-slave files for each interface
+  become: yes
+  #notify: network_changed
+  template:
+    src: bridge-slave.nmconnection.j2
+    dest: "/etc/NetworkManager/system-connections/{{bridge_interface_name}}-slave.nmconnection"
+    mode: '0600'
+
+- name: fetch network list
+  become: yes
+  community.libvirt.virt_net:
+    command: list_nets
+  register: existing_networks
+
+- name: create libvirt network
+  become: yes
+  community.libvirt.virt_net:
+    command: create
+    autostart: yes
+    name: "{{bridge_interface_name}}-bridge"
+    state: present
+    xml: "{{lookup('template', 'libvirt-bridge-net.xml.j2')}}"
+  when: (bridge_interface_name + '-bridge') not in existing_networks.list_nets

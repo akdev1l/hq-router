@@ -1,0 +1,22 @@
+---
+- name: customize virtualization platform for router usage
+  hosts: ontario.hq.akdev.xyz
+  tasks:
+    - name: import global variables
+      include_vars: vars.yml
+    - name: import secrets
+      include_vars: secrets.yml
+    - import_tasks: ./virtualization/create-bridges.yml
+      vars:
+        bridge_interface_name: "{{router_uplink_interface}}"
+        bridge_ip_method: disabled
+
+- name: deploy virtual router guest
+  hosts: router
+  gather_facts: no
+  tasks:
+    - name: import global variables
+      include_vars: vars.yml
+    - name: import secrets
+      include_vars: secrets.yml
+    - import_tasks: router/create.yml

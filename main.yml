@@ -1,0 +1,8 @@
+---
+- name: import variables file
+  hosts: localhost
+  tasks:
+    - include_vars: vars.yml
+
+- import_playbook: virtualization-platform.yml
+- import_playbook: router.yml

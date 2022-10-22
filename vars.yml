@@ -1,0 +1,19 @@
+# Backup Configuration
+backup_dir: /mnt/sata/rust
+backup_host: canzuk.hq.akdev.xyz
+
+# Network Configuration
+network_gateway: 10.0.1.1
+network_nameservers:
+  - 10.0.1.2
+network_search_domain: hq.akdev.xyz
+#
+# Router configuration
+router_os_image_url: 'https://mirrors.nycbug.org/pub/opnsense/releases/mirror/OPNsense-22.7-OpenSSL-dvd-amd64.iso.bz2' 
+
+# Base OS Configuration
+base_os_image_url: "https://download.fedoraproject.org/pub/fedora/linux/releases/test/37_Beta/Server/x86_64/iso/Fedora-Server-netinst-x86_64-37_Beta-1.5.iso"
+
+
+# Variables for convenience
+libvirt_image_dir: /var/lib/libvirt/images

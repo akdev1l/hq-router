@@ -1,0 +1,19 @@
+#!/bin/bash
+
+if [ ! -f {{libvirt_image_dir}}/router-os.iso ]; then
+    curl -Lo "{{libvirt_image_dir}}/router-os.iso.bz2" {{router_os_image_url}}
+    bunzip2 "{{libvirt_image_dir}}/router-os.iso.bz2"
+fi
+
+virt-install \
+	--name {{inventory_hostname}} \
+	--vcpus {{system_cpu | default('2')}} \
+	--disk size={{system_disk | default('20')}} \
+	--memory {{system_memory | default('4096') }} \
+	--os-variant freebsd12.1 \
+	--network network={{uplink_network}} \
+	--network network={{local_network}} \
+	--cdrom {{libvirt_image_dir}}/router-os.iso \
+	--serial pty \
+	--graphics vnc,listen={{hostvars["ontario.hq.akdev.xyz"]["ansible_host"]}},password={{bootstrap_router_password}} \
+	--noautoconsole

@@ -1,0 +1,42 @@
+---
+testing:
+  hosts:
+    test.hq.akdev.xyz:
+      ansible_host: 10.0.1.9
+      boot_disk: vda
+      system_disks:
+        - vda
+
+hypervisors:
+  hosts:
+    ontario.hq.akdev.xyz:
+      ansible_host: 10.0.1.2
+      router_uplink_interface: enp1s0
+      system_interface: enp2s0
+      system_disks:
+        - sda
+    vancouver.hq.akdev.xyz:
+      ansible_host: 10.0.1.10
+      boot_disk: nvme0n1
+      system_disks:
+        - nvme0n1
+        - nvme1n1
+    canzuk.hq.akdev.xyz:
+      ansible_host: 10.0.1.11
+      system_disks:
+        - nvme0n1
+        - nvme1n1
+    halifax.hq.akdev.xyz:
+      ansible_host: 10.0.1.12
+      system_disks:
+        - sda
+
+router:
+  hosts:
+    router.hq.akdev.xyz:
+      ansible_host: 10.0.1.1
+      ansible_user: admin
+      ansible_become_method: su
+      uplink_network: enp1s0-bridge
+      local_network: enp2s0-bridge
+

@@ -1,0 +1,12 @@
+---
+- name: "download OS image from {{os_image_url}}"
+  when: no
+  get_url:
+    url: "{{os_image_url}}"
+    dest: "{{lookup('env' , 'PWD')}}/build/base-os.iso"
+    mode: '0600'
+  register: downloaded_file
+
+- name: set download_os_image to the downloaded file
+  set_fact:
+    downloaded_os_image: "{{lookup('env' , 'PWD')}}/build/base-os.iso"

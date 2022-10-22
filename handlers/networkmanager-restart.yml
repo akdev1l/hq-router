@@ -1,0 +1,7 @@
+---
+- name: reload network manager configuration
+  listen: network_changed
+  become: yes
+  systemd:
+    name: NetworkManager
+    state: reloaded

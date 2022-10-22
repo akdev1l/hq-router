@@ -1,0 +1,10 @@
+---
+- name: prepare hosts for virtualization workloads
+  hosts: ontario.hq.akdev.xyz
+  tasks:
+    - import_tasks: router/create.yml
+
+- name: configure virtual router
+  hosts: router.hq.akdev.xyz
+  tasks:
+    - import_tasks: router/configure.yml

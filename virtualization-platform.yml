@@ -1,0 +1,13 @@
+---
+- name: prepare hosts for virtualization workloads
+  hosts: hypervisors
+  tasks:
+    - name: import global variables
+      include_vars: vars.yml
+    - name: import secrets
+      include_vars: secrets.yml
+    - import_tasks: ./virtualization/base.yml
+    - import_tasks: ./virtualization/create-bridges.yml
+      vars:
+        bridge_interface_name: "{{system_interface}}"
+        bridge_ip_method: manual

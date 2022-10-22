@@ -1,0 +1,5 @@
+---
+- name: "download base os image {{router_base_os_url}} to {{libvirt_image_dir}}"
+  get_url:
+    url: "{{router_base_os_url}}"
+    dest: "{{libvirt_image_dir}}/router-base-os.iso"

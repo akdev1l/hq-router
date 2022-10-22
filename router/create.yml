@@ -1,0 +1,11 @@
+---
+- name: create virtual router with virt-install
+  become: yes
+  delegate_to: ontario.hq.akdev.xyz
+  shell: "{{lookup('template', 'router-install.sh.j2')}}"
+  args:
+    creates: "{{libvirt_image_dir}}/{{inventory_hostname}}.qcow2"
+
+- name: wait for creation confirmation
+  pause:
+    prompt: press enter to confirm router has been created

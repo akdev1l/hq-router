@@ -1,0 +1,64 @@
+{% set system_disks = hostvars[bootstrap_hostname]["system_disks"] %}
+# Use text install
+text
+
+# Install Source
+url --metalink=https://mirrors.fedoraproject.org/metalink?repo=fedora-$releasever&arch=$basearch
+
+# Network configuration
+network --bootproto=dhcp --hostname={{bootstrap_hostname}}
+
+# Keyboard layouts
+keyboard --vckeymap=us --xlayouts='us'
+# System language
+lang en_CA.UTF-8
+
+# Ignore disks except system disks
+ignoredisk --only-use={{system_disks | join(',')}}
+
+# Partition clearing information
+zerombr
+clearpart --drives={{system_disks | join(',')}} --initlabel --all
+
+# Disk partitioning information
+reqpart
+
+{% if (system_disks|length) > 1 %}
+
+{% for device in system_disks %}
+part raid.1{{loop.index}} --size=1024 --asprimary --ondrive={{device}} --fstype="mdmember"
+{% endfor %}
+raid /boot --device=system-boot --fstype="ext4" --level=RAID1 --label=md-boot {% for device in system_disks %} raid.1{{loop.index}} {% endfor %}
+
+{% for device in system_disks %}
+part raid.2{{loop.index}} --grow --asprimary --ondrive={{device}} --fstype="mdmember"
+{% endfor %}
+raid btrfs.01 --device=system-root --fstype="btrfs" --level=RAID0 {% for device in system_disks %} raid.2{{loop.index}} {% endfor %}
+
+{% else %}
+
+part /boot --fstype="ext4" --label=system-boot --size=1024 --ondrive={{system_disks[0]}}
+part btrfs.01 --fstype="btrfs" --grow --ondrive={{system_disks[0]}}
+
+{% endif %}
+
+btrfs none --label=master btrfs.01
+btrfs / --subvol --name=@root LABEL=master
+btrfs /home --subvol --name=@home LABEL=master
+btrfs /var/log --subvol --name=@log LABEL=master
+
+# System timezone
+timezone America/Toronto --utc
+
+#Root password
+rootpw --lock
+
+# Default user
+user --name=akdev --groups=wheel --password={{bootstrap_password}}
+sshkey --user=akdev "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC/+uQuSBwFZecLIXDjTSf1lVMzOsxDjkPk7h5GF8rsn31rWOssyDJyQewjsQ0tIEhsxmQ14x8RNx6kmKKBk0qgO/SlLzjE27bcaq8Y96PftzUftlGhMqN2h3/SDqTaPlB2laGO9oPAwaZRaCj7zXMdZe4mkLSCZXCytGRNyhg36/FdDsal4onAes3diEa+huz1C3PQVKu59Oc2KVZw2Onw3jH/ddBfusIr8SNvi+sPl5TfvEr4ww99IJ3XR1XvQfbHjNnKZ0jU275jzHPX6mRqg0PZJ9tPiwvXIoFG1E/MXKagKZtBfGRkGIQVHx8eux/lTlEYWPh65/aeMgcKj4ra2y3UFdsRPo//WnRNiRRtmTJFNUC1jg8j6qbOhA8bI0OVQsIYQEaY8/f+uRK3+AcPa8OaPOrTSjJ2/9zFibwshYShmLgc/KskXaeMfUpjS5ylWufzNWVsbBY8dpfUtSvss9Ml3VH9mKWEeOm0fCAJH/MoKLBnxUqBA3hd3o3lpXJMIiz8732+SdhxXeHqNXJOYxqJFJmWcwZ2Tz8Kbfb0l42rEu/i0sbzTWOpWFew7k7QP0cNKsNFK5B55R+2UqRxBqBC8K6b936WzbrERznfjb1e8HKly/tKfWilpZsUXtcCkn2x4Sf8NZLbX3wZjXrr3T6tKz9LfdQBsKVcIPCSpw== cardno:12 279 794"
+
+%packages
+@server-product-environment
+kernel
+@Core
+%end

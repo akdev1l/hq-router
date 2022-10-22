@@ -1,0 +1,10 @@
+---
+- name: get guest list
+  become: yes
+  community.libvirt.virt:
+    command: list_vms
+  register: guest_list
+
+- name: set virtual_guests fact
+  set_fact:
+    virtual_guests: "{{guest_list.list_vms}}"

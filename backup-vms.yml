@@ -1,0 +1,11 @@
+---
+- name: backup all virtual guests
+  hosts: hypervisors
+  tasks:
+    - import_tasks: virtualization/get-guests.yml
+    - include_tasks: virtualization/copy-disk.yml
+      loop: "{{virtual_guests}}"
+      vars:
+        dest_host: "{{backup_host}}"
+        dest_dir: "{{backup_dir}}"
+        src_guest: "{{item}}"

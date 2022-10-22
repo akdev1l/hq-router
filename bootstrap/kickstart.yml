@@ -1,0 +1,6 @@
+---
+- name: deploy kickstart file onto OEMDRV
+  become: yes
+  template:
+    src: ks.cfg.j2
+    dest: "{{lookup('env', 'PWD')}}/build/OEMDRV/ks.cfg"

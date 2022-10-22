@@ -1,0 +1,20 @@
+---
+- name: bootstrap a host OS installation
+  hosts: localhost
+  vars_prompt:
+    - name: bootstrap_hostname
+      prompt: what is the hostname of the new host?
+      private: no
+    - name: usb_drive_path
+      prompt: enter storage media for installer
+      private: no
+  tasks:
+    - name: import global variables
+      include_vars: vars.yml
+    - name: import secret variables
+      include_vars: secrets.yml
+    - import_tasks: bootstrap/get-os-image.yml
+      vars:
+        os_image_url: "{{base_os_image_url}}"
+    - import_tasks: bootstrap/flash-usb.yml
+    - import_tasks: bootstrap/kickstart.yml

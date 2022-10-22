@@ -1,0 +1,55 @@
+---
+- name: "extract grub.cfg from {{downloaded_os_image}}"
+  shell: |
+    osirrox -indev {{downloaded_os_image}} \
+      -extract EFI/BOOT/grub.cfg {{lookup('env', 'PWD')}}/build/grub.cfg \
+      -extract EFI/BOOT/BOOT.conf {{lookup('env', 'PWD')}}/build/BOOT.conf
+
+- name: patch boot configuration
+  replace:
+    path: "{{item}}"
+    regexp: 'quiet$'
+    replace: 'inst.ks=hd:LABEL=Fedora-S-dvd-x86_64-37'
+  loop:
+    - "{{lookup('env', 'PWD')}}/build/grub.cfg"
+    - "{{lookup('env', 'PWD')}}/build/BOOT.conf"
+
+- name: set install as default boot entry
+  replace:
+    regexp: 'default="11"'
+    replace: 'default="0"'
+    path: "{{item}}"
+  loop:
+    - "{{lookup('env', 'PWD')}}/build/grub.cfg"
+    - "{{lookup('env', 'PWD')}}/build/BOOT.conf"
+
+- name: deploy ks.cfg file
+  template:
+    src: ks.cfg.j2
+    dest: "{{lookup('env', 'PWD')}}/build/ks.cfg"
+
+- name: create new customized ISO
+  shell: |
+    rm {{lookup('env', 'PWD')}}/build/custom.iso
+    xorriso -indev {{lookup('env', 'PWD')}}/build/base-os.iso \
+        -outdev {{lookup('env', 'PWD')}}/build/custom.iso \
+        -map {{lookup('env', 'PWD')}}/build/ks.cfg ks.cfg \
+        -map {{lookup('env', 'PWD')}}/build/grub.cfg boot/grub2/grub.cfg \
+        -map {{lookup('env', 'PWD')}}/build/grub.cfg EFI/BOOT/grub.cfg \
+        -map {{lookup('env', 'PWD')}}/build/BOOT.conf EFI/BOOT/BOOT.conf \
+        -compliance no_emul_toc \
+        -boot_image any replay
+
+- name: set fact path to custom.iso
+  set_fact:
+    custom_os_image: "{{lookup('env', 'PWD')}}/build/custom.iso"
+
+- name: "ask for confirmation - we are going to flash {{usb_drive_path}} with {{downloaded_os_image}}"
+  pause:
+    prompt: "enter Y to flash the drive, N to skip flashing"
+  register: confirmation
+
+- name: flash {{custom_os_image}} onto flash drive
+  when: (confirmation.user_input | lower) == "y"
+  become: yes
+  shell: "dd if={{custom_os_image}} of={{usb_drive_path}} bs=4096 conv=fdatasync"
