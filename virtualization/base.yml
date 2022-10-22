@@ -5,10 +5,17 @@
     name:
       - libvirt
       - qemu-kvm
-      - openvswitch
       - python3-libvirt
       - python3-lxml
       - virt-install
+    state: present
+
+- name: add user to libvirt group
+  become: yes
+  user:
+    name: akdev
+    groups: libvirt
+    append: yes
 
 - name: start virtualization services
   become: yes

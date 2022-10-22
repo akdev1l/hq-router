@@ -16,18 +16,19 @@ hypervisors:
       system_disks:
         - sda
     vancouver.hq.akdev.xyz:
-      ansible_host: 10.0.1.10
+      ansible_host: 10.0.1.11
       boot_disk: nvme0n1
+      system_interface: enp9s0
       system_disks:
         - nvme0n1
-        - nvme1n1
     canzuk.hq.akdev.xyz:
-      ansible_host: 10.0.1.11
+      ansible_host: 10.0.1.10
       system_disks:
         - nvme0n1
         - nvme1n1
     halifax.hq.akdev.xyz:
       ansible_host: 10.0.1.12
+      system_interface: enp3s0
       system_disks:
         - sda
 
